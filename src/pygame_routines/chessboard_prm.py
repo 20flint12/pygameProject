@@ -4,7 +4,7 @@ import pygame
 pygame.init()
 
 # Set the dimensions of the chessboard
-WIDTH, HEIGHT = 800, 800
+WIDTH, HEIGHT = 400, 400
 
 # Set the dimensions of each square
 SQUARE_SIZE = WIDTH // 8
@@ -19,7 +19,6 @@ GRAY = (128, 128, 128)
 # Create the Pygame window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Chessboard")
-
 
 class Square:
     def __init__(self, row, col):
@@ -37,10 +36,18 @@ class Square:
 
         # Add text on the square
         font = pygame.font.Font(None, 20)
-        text = font.render(f"Prm: {self.parameter}", True, RED)
+        text = font.render(f"Param: {self.parameter}", True, RED)
         text_rect = text.get_rect(center=square_rect.center)
         screen.blit(text, text_rect)
 
+    @classmethod
+    def get_neighboring_parameters(cls, row, col, chessboard):
+        parameters = []
+        for i in range(max(0, row - 1), min(row + 2, 8)):
+            for j in range(max(0, col - 1), min(col + 2, 8)):
+                if (i, j) != (row, col):
+                    parameters.append(chessboard[i][j].parameter)
+        return parameters
 
 # Create a two-dimensional list to represent the chessboard
 chessboard = [[Square(row, col) for col in range(8)] for row in range(8)]
@@ -111,15 +118,15 @@ while running:
             square = chessboard[row][col]
             square.draw()
 
-            # # Highlight the selected square
-            # if selected_square == square:
-            #     pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
+            # Highlight the selected square
+            if selected_square == square:
+                pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
 
     # Draw the parameter input button
     parameter_button_rect = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 40, 100, 30)
     pygame.draw.rect(screen, WHITE, parameter_button_rect)
     font = pygame.font.Font(None, 20)
-    button_text = font.render("Set Prm", True, BLACK)
+    button_text = font.render("Set Parameter", True, BLACK)
     button_text_rect = button_text.get_rect(center=parameter_button_rect.center)
     screen.blit(button_text, button_text_rect)
 
@@ -131,9 +138,13 @@ while running:
     input_text_rect = input_text.get_rect(center=input_rect.center)
     screen.blit(input_text, input_text_rect)
 
+    # Check neighboring parameters for selected square
+    if selected_square is not None:
+        neighboring_parameters = Square.get_neighboring_parameters(selected_square.row, selected_square.col, chessboard)
+        print("Neighboring Parameters:", neighboring_parameters)
+
     # Update the display
     pygame.display.flip()
 
 # Quit Pygame
 pygame.quit()
-

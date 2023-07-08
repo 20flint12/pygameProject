@@ -30,6 +30,8 @@ class Square:
         self.col = col
         self.clicks = 0
         self.start_time = None
+        self.input_parameter = ""
+        self.parameter = 0
 
     def toggle_color(self):
         self.clicks += 1
@@ -46,9 +48,9 @@ class Square:
 
         # Add text on the square
         font = pygame.font.Font(None, 20)
-        text = font.render(f"{self.row},{self.col}", True, RED)
-        text_rect = text.get_rect(center=square_rect.center)
-        screen.blit(text, text_rect)
+        # text = font.render(f"{self.row},{self.col}", True, RED)
+        # text_rect = text.get_rect(center=square_rect.center)
+        # screen.blit(text, text_rect)
 
         # Add click counter on the square
         counter_text = font.render(str(self.clicks), True, GREEN)
@@ -61,6 +63,23 @@ class Square:
             timer_text = font.render(str(elapsed_time), True, BLUE)
             timer_rect = timer_text.get_rect(center=(square_rect.centerx, square_rect.centery - SQUARE_SIZE // 4))
             screen.blit(timer_text, timer_rect)
+
+        # Add input parameter on the square
+        parameter_text = font.render(str(self.input_parameter), True, WHITE)
+        parameter_rect = parameter_text.get_rect(center=square_rect.center)
+        screen.blit(parameter_text, parameter_rect)
+
+    def set_input_parameter(self, value):
+        self.input_parameter = value
+
+    @classmethod
+    def get_neighboring_parameters(cls, row, col, chessboard):
+        parameters = []
+        for i in range(max(0, row - 1), min(row + 2, SQUARE_AMOUNT)):
+            for j in range(max(0, col - 1), min(col + 2, SQUARE_AMOUNT)):
+                if (i, j) != (row, col):
+                    parameters.append(chessboard[i][j].input_parameter)
+        return parameters
 
 
 # Create a two-dimensional list to represent the chessboard
@@ -93,12 +112,22 @@ while running:
                 #     selected_square = None
                 # else:
                 selected_square = square
-                print(selected_square.get_color())
+                # print(selected_square.get_color())
 
 
             # Toggle the color of the selected square
             square = chessboard[row][col]
             square.toggle_color()
+
+        elif event.type == pygame.KEYDOWN:
+            # Handle key press events for input parameter
+            if selected_square is not None:
+                if event.key == pygame.K_BACKSPACE:
+                    selected_square.set_input_parameter(selected_square.input_parameter[:-1])
+                elif event.key == pygame.K_RETURN:
+                    pass
+                else:
+                    selected_square.set_input_parameter(selected_square.input_parameter + event.unicode)
 
     # Draw the chessboard
     for row in range(SQUARE_AMOUNT):
@@ -110,11 +139,16 @@ while running:
             if selected_square == square:
                 pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
 
-
     # # Highlight the selected square
     # if selected_square is not None:
     #     row, col = selected_square
     #     pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
+
+
+    # Check neighboring parameters for selected square
+    if selected_square is not None:
+        neighboring_parameters = Square.get_neighboring_parameters(selected_square.row, selected_square.col, chessboard)
+        print("(", selected_square.row, selected_square.col, ")", "Neighboring Parameters:", neighboring_parameters)
 
 
     # Update the display
