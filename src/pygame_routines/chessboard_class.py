@@ -1,6 +1,5 @@
 import pygame
 from pygame import gfxdraw
-import time
 
 # Initialize Pygame
 pygame.init()
@@ -9,21 +8,46 @@ pygame.init()
 WIDTH, HEIGHT = 800, 800
 
 # Set the dimensions of each square
-SQUARE_AMOUNT = 17
-SQUARE_SIZE = WIDTH // SQUARE_AMOUNT
+SQUARE_SIZE = WIDTH // 8
 
 # Define colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
 
 # Create the Pygame window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Evolution game")
+pygame.display.set_caption("Chessboard")
 
 
+# class Square:
+#     def __init__(self, row, col):
+#         self.row = row
+#         self.col = col
+#         self.clicks = 0
+#
+#     def toggle_color(self):
+#         self.clicks += 1
+#
+#     def get_color(self):
+#         brightness = min(self.clicks * 25, 255)
+#         return (brightness, brightness, brightness)
+#
+#     def draw(self):
+#         square_rect = pygame.Rect(self.col * SQUARE_SIZE, self.row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+#         pygame.draw.rect(screen, self.get_color(), square_rect)
+#
+#         # Add text on the square
+#         font = pygame.font.Font(None, 20)
+#         text = font.render(f"{self.row},{self.col}", True, RED)
+#         text_rect = text.get_rect(center=square_rect.center)
+#         screen.blit(text, text_rect)
+#
+#         # Add click counter on the square
+#         counter_text = font.render(str(self.clicks), True, GREEN)
+#         counter_rect = counter_text.get_rect(center=(square_rect.centerx, square_rect.centery + SQUARE_SIZE // 4))
+#         screen.blit(counter_text, counter_rect)
 class Square:
     def __init__(self, row, col):
         self.row = row
@@ -37,7 +61,7 @@ class Square:
             self.start_time = time.time()
 
     def get_color(self):
-        brightness = min(self.clicks * 5, 255)
+        brightness = min(self.clicks * 25, 255)
         return (brightness, brightness, brightness)
 
     def draw(self):
@@ -58,13 +82,12 @@ class Square:
         # Add timer label on the square
         if self.start_time is not None:
             elapsed_time = int(time.time() - self.start_time)
-            timer_text = font.render(str(elapsed_time), True, BLUE)
+            timer_text = font.render(str(elapsed_time), True, RED)
             timer_rect = timer_text.get_rect(center=(square_rect.centerx, square_rect.centery - SQUARE_SIZE // 4))
             screen.blit(timer_text, timer_rect)
 
-
 # Create a two-dimensional list to represent the chessboard
-chessboard = [[Square(row, col) for col in range(SQUARE_AMOUNT)] for row in range(SQUARE_AMOUNT)]
+chessboard = [[Square(row, col) for col in range(8)] for row in range(8)]
 
 # Variable to keep track of the currently selected square
 selected_square = None
@@ -84,38 +107,19 @@ while running:
             row = y // SQUARE_SIZE
             col = x // SQUARE_SIZE
 
-            # Check if the click is inside the chessboard
-            if 0 <= row < SQUARE_AMOUNT and 0 <= col < SQUARE_AMOUNT:
-                square = chessboard[row][col]
-
-                # Check if the square is selected
-                # if selected_square == square:
-                #     selected_square = None
-                # else:
-                selected_square = square
-                print(selected_square.get_color())
-
-
             # Toggle the color of the selected square
             square = chessboard[row][col]
             square.toggle_color()
 
     # Draw the chessboard
-    for row in range(SQUARE_AMOUNT):
-        for col in range(SQUARE_AMOUNT):
-            square = chessboard[row][col]
-            square.draw()
+    for row in range(8):
+        for col in range(8):
+            chessboard[row][col].draw()
 
-            # Highlight the selected square
-            if selected_square == square:
-                pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
-
-
-    # # Highlight the selected square
-    # if selected_square is not None:
-    #     row, col = selected_square
-    #     pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
-
+    # Highlight the selected square
+    if selected_square is not None:
+        row, col = selected_square
+        pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
 
     # Update the display
     pygame.display.flip()

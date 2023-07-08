@@ -9,7 +9,7 @@ pygame.init()
 WIDTH, HEIGHT = 800, 800
 
 # Set the dimensions of each square
-SQUARE_AMOUNT = 17
+SQUARE_AMOUNT = 12
 SQUARE_SIZE = WIDTH // SQUARE_AMOUNT
 
 # Define colors
@@ -84,18 +84,6 @@ while running:
             row = y // SQUARE_SIZE
             col = x // SQUARE_SIZE
 
-            # Check if the click is inside the chessboard
-            if 0 <= row < SQUARE_AMOUNT and 0 <= col < SQUARE_AMOUNT:
-                square = chessboard[row][col]
-
-                # Check if the square is selected
-                # if selected_square == square:
-                #     selected_square = None
-                # else:
-                selected_square = square
-                print(selected_square.get_color())
-
-
             # Toggle the color of the selected square
             square = chessboard[row][col]
             square.toggle_color()
@@ -103,19 +91,12 @@ while running:
     # Draw the chessboard
     for row in range(SQUARE_AMOUNT):
         for col in range(SQUARE_AMOUNT):
-            square = chessboard[row][col]
-            square.draw()
+            chessboard[row][col].draw()
 
-            # Highlight the selected square
-            if selected_square == square:
-                pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
-
-
-    # # Highlight the selected square
-    # if selected_square is not None:
-    #     row, col = selected_square
-    #     pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
-
+    # Highlight the selected square
+    if selected_square is not None:
+        row, col = selected_square
+        pygame.draw.rect(screen, GREEN, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 4)
 
     # Update the display
     pygame.display.flip()
